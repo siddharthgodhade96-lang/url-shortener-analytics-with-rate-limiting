@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: url-shortener
+  config:
+    # Lets you keep local passwords in one .env file at the project root.
+    # Real environment variables still win. Missing files are ignored.
+    import:
+      - "optional:file:./.env[.properties]"
+      - "optional:file:../.env[.properties]"
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:${MYSQL_PORT:3306}/url_shortener?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${MYSQL_USER:url_shortener}
+    password: ${MYSQL_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+
+app:
+  cors:
+    allowed-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+  rate-limit:
+    create-url:
+      capacity: ${RATE_LIMIT_CREATE_CAPACITY:10}
+      refill-rate: ${RATE_LIMIT_CREATE_REFILL_RATE:0.1666666667}
+    analytics:
+      capacity: ${RATE_LIMIT_ANALYTICS_CAPACITY:30}
+      refill-rate: ${RATE_LIMIT_ANALYTICS_REFILL_RATE:0.5}
+    public-redirect:
+      capacity: ${RATE_LIMIT_REDIRECT_CAPACITY:120}
+      refill-rate: ${RATE_LIMIT_REDIRECT_REFILL_RATE:2.0}
+  analytics:
+    executor:
+      core-pool-size: ${ANALYTICS_CORE_POOL_SIZE:2}
+      max-pool-size: ${ANALYTICS_MAX_POOL_SIZE:4}
+      queue-capacity: ${ANALYTICS_QUEUE_CAPACITY:500}
+
+rate-limit:
+  provider: ${RATE_LIMIT_PROVIDER:bucket4j}
+
+server:
+  port: ${SERVER_PORT:8080}
